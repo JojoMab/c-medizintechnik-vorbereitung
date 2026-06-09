@@ -15,16 +15,16 @@ Kleine C-Übungen zur Vorbereitung auf ein Medizintechnikstudium. Die Programme 
 ## Voraussetzungen
 
 - macOS, Linux oder Windows mit C-Compiler
-- empfohlen: `clang` oder `gcc`
+- empfohlen: `gcc`
 - optional: `make`
 
-Compiler auf macOS prüfen:
+Compiler prüfen:
 
 ```bash
-clang --version
+gcc --version
 ```
 
-Falls `clang` fehlt:
+Falls `gcc` auf macOS fehlt:
 
 ```bash
 xcode-select --install
@@ -55,17 +55,17 @@ make clean
 ## Ohne Makefile kompilieren
 
 ```bash
-clang -std=c17 -Wall -Wextra -Wpedantic -g day01_medtech_monitor.c -o day01_medtech_monitor
+gcc -std=c17 -Wall -Wextra -Wpedantic -g day01_medtech_monitor.c -o day01_medtech_monitor
 ./day01_medtech_monitor
 ```
 
 ```bash
-clang -std=c17 -Wall -Wextra -Wpedantic -g day02_vital_values.c -o day02_vital_values
+gcc -std=c17 -Wall -Wextra -Wpedantic -g day02_vital_values.c -o day02_vital_values
 ./day02_vital_values
 ```
 
 ```bash
-clang -std=c17 -Wall -Wextra -Wpedantic -g day03_vital_check.c -o day03_vital_check
+gcc -std=c17 -Wall -Wextra -Wpedantic -g day03_vital_check.c -o day03_vital_check
 ./day03_vital_check
 ```
 
