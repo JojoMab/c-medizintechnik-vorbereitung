@@ -1,0 +1,7 @@
+.DS_Store
+build/
+*.o
+*.out
+day01_medtech_monitor
+day02_vital_values
+day03_vital_check
