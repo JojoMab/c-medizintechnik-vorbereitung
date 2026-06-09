@@ -1,73 +1,69 @@
-#include <stdio.h>   // Stellt printf und fgets für Ein- und Ausgabe bereit.
-#include <stdlib.h>  // Stellt strtod und strtol für sichere Zahlenumwandlung bereit.
-#include <ctype.h>   // Stellt isspace bereit, um Leerzeichen am Eingabeende zu prüfen.
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 
-// Von Codex ergänzt: Hilfsfunktion, damit Nutzer 37,2 oder 37.2 eingeben können.
-static void normalize_decimal_separator(char text[]) {       // Nimmt eine veränderbare Zeichenkette entgegen.
-    for (size_t i = 0; text[i] != '\0'; i++) {               // Läuft Zeichen für Zeichen bis zum String-Ende.
-        if (text[i] == ',') {                                // Prüft, ob das aktuelle Zeichen ein Komma ist.
-            text[i] = '.';                                   // Ersetzt das Komma durch einen Punkt für C-Zahlen.
+// Erlaubt bei Kommazahlen sowohl 37.2 als auch 37,2.
+static void normalize_decimal_separator(char text[]) {
+    for (int i = 0; text[i] != '\0'; i++) {
+        if (text[i] == ',') {
+            text[i] = '.';
         }
     }
 }
 
-// Von Codex ergänzt: Liest eine Kommazahl robust ein und erkennt ungültige Eingaben.
-static int read_double(const char *prompt, double *out_value) { // Bekommt einen Fragetext und einen Speicherort für das Ergebnis.
-    char line[128];                                            // Reserviert Platz für die komplette Eingabezeile.
-    char *end = NULL;                                          // Merkt sich später, wo die Umwandlung aufgehört hat.
+// Liest eine Kommazahl ein und erkennt ungültige Eingaben wie "abc" oder "37abc".
+static int read_double(const char *prompt, double *out_value) {
+    char line[100];
+    char *end = NULL;
 
-    printf("%s", prompt);                                      // Gibt den Fragetext aus, z. B. "Enter temperature in C: ".
+    printf("%s", prompt);
 
-    if (fgets(line, sizeof(line), stdin) == NULL) {             // Liest eine ganze Zeile aus der Tastatur.
-        return 0;                                              // Gibt Fehler zurück, falls keine Eingabe gelesen werden konnte.
+    if (fgets(line, sizeof(line), stdin) == NULL) {
+        return 0;
     }
 
-    normalize_decimal_separator(line);                         // Erlaubt deutsches Dezimalkomma durch Umwandlung in Punkt.
-    double value = strtod(line, &end);                          // Wandelt den Text in eine double-Zahl um.
+    normalize_decimal_separator(line);
+    *out_value = strtod(line, &end);
 
-    if (line == end) {                                         // Prüft, ob gar keine Zahl erkannt wurde.
-        return 0;                                              // Meldet ungültige Eingabe.
+    if (line == end) {
+        return 0;
     }
 
-    while (*end != '\0' && isspace((unsigned char)*end)) {      // Überspringt erlaubte Leerzeichen nach der Zahl.
-        end++;                                                 // Geht zum nächsten Zeichen.
+    while (*end != '\0' && isspace((unsigned char)*end)) {
+        end++;
     }
 
-    if (*end != '\0') {                                        // Prüft, ob nach der Zahl noch unerlaubter Text steht.
-        return 0;                                              // Meldet Fehler, z. B. bei "37abc".
-    }
-
-    *out_value = value;                                        // Schreibt die erkannte Zahl in die Variable aus main.
-    return 1;                                                  // Meldet Erfolg.
+    return *end == '\0';
 }
 
-// Von Codex ergänzt: Liest eine ganze Zahl robust ein und erkennt ungültige Eingaben.
-static int read_int(const char *prompt, int *out_value) {       // Bekommt einen Fragetext und einen Speicherort für das Ergebnis.
-    char line[128];                                            // Reserviert Platz für die komplette Eingabezeile.
-    char *end = NULL;                                          // Merkt sich später, wo die Umwandlung aufgehört hat.
+// Liest eine ganze Zahl ein und erkennt ungültige Eingaben wie "abc" oder "82bpm".
+static int read_int(const char *prompt, int *out_value) {
+    char line[100];
+    char *end = NULL;
+    long value = 0;
 
-    printf("%s", prompt);                                      // Gibt den Fragetext aus, z. B. "Enter heart rate in bpm: ".
+    printf("%s", prompt);
 
-    if (fgets(line, sizeof(line), stdin) == NULL) {             // Liest eine ganze Zeile aus der Tastatur.
-        return 0;                                              // Gibt Fehler zurück, falls keine Eingabe gelesen werden konnte.
+    if (fgets(line, sizeof(line), stdin) == NULL) {
+        return 0;
     }
 
-    long value = strtol(line, &end, 10);                        // Wandelt den Text als Dezimalzahl in eine long-Zahl um.
+    value = strtol(line, &end, 10);
 
-    if (line == end) {                                         // Prüft, ob gar keine Zahl erkannt wurde.
-        return 0;                                              // Meldet ungültige Eingabe.
+    if (line == end) {
+        return 0;
     }
 
-    while (*end != '\0' && isspace((unsigned char)*end)) {      // Überspringt erlaubte Leerzeichen nach der Zahl.
-        end++;                                                 // Geht zum nächsten Zeichen.
+    while (*end != '\0' && isspace((unsigned char)*end)) {
+        end++;
     }
 
-    if (*end != '\0') {                                        // Prüft, ob nach der Zahl noch unerlaubter Text steht.
-        return 0;                                              // Meldet Fehler, z. B. bei "82bpm".
+    if (*end != '\0') {
+        return 0;
     }
 
-    *out_value = (int)value;                                   // Schreibt die erkannte Zahl als int in die Variable aus main.
-    return 1;                                                  // Meldet Erfolg.
+    *out_value = (int)value;
+    return 1;
 }
 
 int main(void) {
@@ -78,41 +74,26 @@ int main(void) {
 
     printf("Patient Vital Check\n");
     printf("===================\n");
-    printf("Learning simulation only. This is not medical software.\n\n"); // Macht klar, dass es nur eine Lernsimulation ist.
+    printf("Learning simulation only. This is not medical software.\n\n");
 
-    if (!read_double("Enter temperature in C: ", &temperature_c)) { // Fragt Temperatur ab und prüft, ob sie gültig ist.
-        printf("Invalid temperature input.\n");                     // Gibt eine verständliche Fehlermeldung aus.
-        return 1;                                                   // Beendet das Programm mit Fehlercode.
+    if (!read_double("Enter temperature in C, for example 37.2 or 37,2: ", &temperature_c)) {
+        printf("Invalid temperature input.\n");
+        return 1;
     }
 
-    if (!read_int("Enter heart rate in bpm: ", &heart_rate_bpm)) { // Fragt Herzfrequenz ab und prüft, ob sie gültig ist.
-        printf("Invalid heart rate input.\n");                     // Gibt eine verständliche Fehlermeldung aus.
-        return 1;                                                  // Beendet das Programm mit Fehlercode.
+    if (!read_int("Enter heart rate in bpm, for example 82: ", &heart_rate_bpm)) {
+        printf("Invalid heart rate input.\n");
+        return 1;
     }
 
-    if (!read_double("Enter oxygen saturation in %: ", &oxygen_percent)) { // Fragt Sauerstoffsättigung ab und prüft die Eingabe.
-        printf("Invalid oxygen saturation input.\n");                      // Gibt eine verständliche Fehlermeldung aus.
-        return 1;                                                          // Beendet das Programm mit Fehlercode.
-    }
-
-    if (temperature_c < 25.0 || temperature_c > 45.0) {      // Prüft, ob die Temperatur für diese Simulation unrealistisch ist.
-        printf("Temperature outside expected simulation range.\n"); // Erklärt, warum das Programm stoppt.
-        return 1;                                            // Beendet das Programm mit Fehlercode.
-    }
-
-    if (heart_rate_bpm < 20 || heart_rate_bpm > 250) {       // Prüft, ob die Herzfrequenz für diese Simulation unrealistisch ist.
-        printf("Heart rate outside expected simulation range.\n"); // Erklärt, warum das Programm stoppt.
-        return 1;                                            // Beendet das Programm mit Fehlercode.
-    }
-
-    if (oxygen_percent < 0.0 || oxygen_percent > 100.0) {    // Prüft, ob die Sauerstoffsättigung als Prozentwert gültig ist.
-        printf("Oxygen saturation must be between 0 and 100 percent.\n"); // Erklärt den gültigen Bereich.
-        return 1;                                            // Beendet das Programm mit Fehlercode.
+    if (!read_double("Enter oxygen saturation in percent, for example 98.5 or 98,5: ", &oxygen_percent)) {
+        printf("Invalid oxygen saturation input.\n");
+        return 1;
     }
 
     printf("\nResult:\n");
 
-    // Körpertemperaturauswertung
+    // Körpertemperatur auswerten.
     if (temperature_c < 36.0) {
         printf("Temperature: Low\n");
         warning_count++;
@@ -123,7 +104,7 @@ int main(void) {
         warning_count++;
     }
 
-    // Auswertung der Herzschlagrate
+    // Herzfrequenz auswerten.
     if (heart_rate_bpm < 60) {
         printf("Heart rate: Low\n");
         warning_count++;
@@ -134,7 +115,7 @@ int main(void) {
         warning_count++;
     }
 
-    // Auswertung der Sauerstoffsättigung des Blutes
+    // Sauerstoffsättigung auswerten.
     if (oxygen_percent < 90.0) {
         printf("Oxygen saturation: Critical\n");
         warning_count++;
@@ -147,7 +128,7 @@ int main(void) {
 
     printf("\n");
 
-    // Bewertung des Patientenzustands
+    // Gesamtstatus anhand der Anzahl auffälliger Werte ausgeben.
     if (warning_count == 0) {
         printf("Overall status: Stable\n");
     } else {

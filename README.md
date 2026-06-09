@@ -10,7 +10,7 @@ Kleine C-Übungen zur Vorbereitung auf ein Medizintechnikstudium. Die Programme 
 |---|---|
 | `day01_medtech_monitor.c` | erste Konsolenausgabe mit `printf` |
 | `day02_vital_values.c` | Variablen, Datentypen und Format-Platzhalter |
-| `day03_vital_check.c` | Eingaben, Bedingungen, Warnzähler und robuste Validierung |
+| `day03_vital_check.c` | Eingaben, Komma-Umwandlung, Gültigkeitserkennung, Bedingungen und Warnzähler |
 
 ## Voraussetzungen
 
@@ -71,7 +71,7 @@ gcc -std=c17 -Wall -Wextra -Wpedantic -g day03_vital_check.c -o day03_vital_chec
 
 ## Beispiel für `day03_vital_check`
 
-Eingabe:
+Eingabe mit Dezimalpunkt:
 
 ```text
 37.2
